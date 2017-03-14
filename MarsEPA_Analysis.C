@@ -1,3 +1,5 @@
+#include "stdio.h"
+#include "stdlib.h"
 #include <iostream>
 #include "TFile.h"
 #include "TTree.h"
@@ -15,7 +17,7 @@
 
 int AnalysePedestal(Char_t *infile){
 
-  TString histname[14] = {"Si1High","Si1Low",
+  TString trname[14] = {"Si1High","Si1Low",
                           "Si2Low","Si2Medium","Si2High",
                           "CsISiPMT1","CsISiPMT2","CsISiPMT3",
                           "CsISiPD1Low","CsISiPD1High",
@@ -24,7 +26,7 @@ int AnalysePedestal(Char_t *infile){
 
   TH1F *h[14];
   for(int i=0;i<14;i++){
-    h[i] = new TH1F(histname[i].Data(),histname[i].Data(),8000,0,16000);
+    h[i] = new TH1F(Form("Hist_%s",trname[i].Data()),Form("Hist_%s",trname[i].Data()),500,0,1000);
   }
 
   /*int Si1High[22],Si1Low[22];
@@ -34,10 +36,18 @@ int AnalysePedestal(Char_t *infile){
   
   TFile *f_in = new TFile(infile);
   TTree *tr_in = (TTree *)f_in->Get("tree_Origin");
+
+  Float_t *xpeaks;
+  Float_t mean_tmp,sigma_tmp;
+
+  TF1 *f1;
+  TSpectrum *s;
+
   for(int j=0;j<14;j++){
     
-    tr_in->Project(h[i],histname[i].Data());
-    TSpectrum *s;
+    tr_in->Project(Form("Hist_%s",trname[j].Data()),Form("%s",trname[j].Data()));
+    s = new TSpectrum(3);
+    
     h[i]->Fit("")
   }  
   return 0;
