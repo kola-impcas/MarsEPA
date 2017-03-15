@@ -61,6 +61,10 @@
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TPoint.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TAttCanvas.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TCanvasImp.h
+./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TGraph.h
+./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TVectorFfwd.h
+./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TVectorDfwd.h
+./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TFitResultPtr.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TStyle.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TAttAxis.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TH1F.h
@@ -70,9 +74,6 @@
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TArrayS.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TArrayF.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/Foption.h
-./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TVectorFfwd.h
-./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TVectorDfwd.h
-./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TFitResultPtr.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TF1.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TFormula.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TBits.h
