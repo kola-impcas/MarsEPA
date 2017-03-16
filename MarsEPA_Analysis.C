@@ -11,6 +11,7 @@
 #include "TF1.h"
 #include "TSpectrum.h"
 #include "TMath.h"
+#include "Strsplit.C"
 
   //###################################//
   //####     Glob variable       ######//
@@ -28,13 +29,21 @@
 //########################################//
 //########################################//
 
-int AnalysePedestal(Char_t *infile,Char_t *outfile){
+int AnalysePedestal(Char_t *infile){
 
   gStyle->SetOptFit(11111);
 
+  char *FileTmp;
+  FileTmp = new char[strlen(infile)+1];
+  strcpy(FileTmp,infile); 
 
+  char FileTag[200]; 
+  SplitString(FileTmp,".root",FileTag);
 
-  
+  char outfile[200];
+  sprintf(outfile,"%s_ped.root",FileTag);
+
+////////////////////////////////////////////// 
   TFile *f_in = new TFile(infile);
   if(!f_in){
     printf("Error in opening input File!\n");
@@ -54,7 +63,7 @@ int AnalysePedestal(Char_t *infile,Char_t *outfile){
   tr_out->Branch("pedsigma",&pedsigma,"pedsigma/F");
   tr_out->Branch("pedname",pedname,"pedname/C");
 
-  FILE *fp = fopen("pedresult.csv","w");
+  FILE *fp = fopen(Form("%s_pedresult.csv",FileTag),"w");
   fprintf(fp,"MarsEPA_ChanNo,MarsEPA_ChanName,Mean,Sigma\n");
 
   Float_t *xpeaks;
@@ -71,7 +80,7 @@ int AnalysePedestal(Char_t *infile,Char_t *outfile){
 
   TH1F *h[14];
  
-  can->Print("PedResult.pdf[");
+  can->Print(Form("%s_PedResult.pdf[",FileTag));
   for(int i=0;i<14;i++){
     h[i] = new TH1F(Form("Hist_%s",trname[i].Data()),Form("Hist_%s",trname[i].Data()),300,0,900);
     tr_in->Project(Form("Hist_%s",trname[i].Data()),Form("%s",trname[i].Data()));
@@ -105,11 +114,11 @@ int AnalysePedestal(Char_t *infile,Char_t *outfile){
     can->cd();
     h[i]->Draw();
     ffit->Draw("lsame");
-    can->Print("PedResult.pdf");
+    can->Print(Form("%s_PedResult.pdf",FileTag));
 
     tr_out->Fill();
   }
-  can->Print("PedResult.pdf]");
+  can->Print(Form("%s_PedResult.pdf]",FileTag));
 
   tr_out->Write();
 
@@ -121,6 +130,18 @@ int AnalysePedestal(Char_t *infile,Char_t *outfile){
 }
 
 int AnalyseCalibration(Char_t *infile,Int_t nPoints,Float_t startVol,Float_t stopVol){
+
+ //////////////////////////////////////////////////// 
+
+  char *FileTmp;
+  FileTmp = new char[strlen(infile)+1];
+  strcpy(FileTmp,infile); 
+
+  char FileTag[200]; 
+  SplitString(FileTmp,".root",FileTag);
+  printf("%s",FileTag);
+
+ /////////////////////////////////////////////////////
 
   Float_t paceVol = (stopVol - startVol)/(nPoints-1);
   //printf("%f",paceVol);
@@ -149,8 +170,8 @@ int AnalyseCalibration(Char_t *infile,Int_t nPoints,Float_t startVol,Float_t sto
   TGraph *gr;
   TCanvas *can_calib = new TCanvas("can_calib","can_calib",800,600);
 
-  can->Print("calibSpectrum.pdf[");
-  can_calib->Print("calibPoint.pdf[");
+  can->Print(Form("%s_calibSpectrum.pdf[",FileTag));
+  can_calib->Print(Form("%s_calibPoint.pdf[",FileTag));
   for(int i=0;i<14;i++){
     hist[i] = new TH1F(Form("Hist_%s",trname[i].Data()),Form("Hist_%s",trname[i].Data()),1000,0,16000);
     tr_in->Project(Form("Hist_%s",trname[i].Data()),Form("%s",trname[i].Data()));
@@ -180,7 +201,7 @@ int AnalyseCalibration(Char_t *infile,Int_t nPoints,Float_t startVol,Float_t sto
     
     can->cd();
     hist[i]->Draw();
-    can->Print("calibSpectrum.pdf");
+    can->Print(Form("%s_calibSpectrum.pdf",FileTag));
 
     fcalib = new TF1("fcalib","gaus",50,1450);
     gr = new TGraph(nPoints,calibVol,mean_tmp);
@@ -189,13 +210,13 @@ int AnalyseCalibration(Char_t *infile,Int_t nPoints,Float_t startVol,Float_t sto
     can_calib->cd();
     gr->Draw();
     gr->Fit("fcalib");
-    can_calib->Print("calibPoint.pdf");
+    can_calib->Print(Form("%s_calibPoint.pdf",FileTag));
 
     can->Update();
     can_calib->Update();
   }
-  can->Print("calibSpectrum.pdf]");
-  can_calib->Print("calibPoint.pdf]");
+  can->Print(Form("%s_calibSpectrum.pdf]",FileTag));
+  can_calib->Print(Form("%s_calibPoint.pdf]",FileTag));
 
   delete can;
   delete can_calib;

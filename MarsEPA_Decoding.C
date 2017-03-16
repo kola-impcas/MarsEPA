@@ -7,6 +7,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1F.h"
+#include "Strsplit.C"
 
 /*int CreateTreeFile(char* dest,char* src){
     int len,n;
@@ -18,7 +19,8 @@
     return 0;
 }*/
 
-int DecodeCalibPacket(char *infile){
+/*int DecodeCalibPacket(char *infile){
+
     /////////////////////////////////////////////////////////////
     ////////////////    Create Data Tree     ////////////////////
     /////////////////////////////////////////////////////////////
@@ -118,8 +120,20 @@ int DecodeCalibPacket(char *infile){
 
     return 0;
 }
+*/
+int DecodeOriginPacket(char *infile){
 
-int DecodeOriginPacket(Char_t *infile){
+    char *inputfileTmp;
+    inputfileTmp = new char[strlen(infile)+1];
+    strcpy(inputfileTmp,infile);
+    printf("%s\n",inputfileTmp);
+
+    char inputfile[200];
+    char inputfileDest[200];
+
+    SplitString(inputfileTmp,".dat",inputfileDest);
+    sprintf(inputfile,"%s.root",inputfileDest);
+
     ////////////////////////////////////////////////////////////
     ////////////////  Decoding Origin Packet  //////////////////
     ////////////////////////////////////////////////////////////
@@ -140,7 +154,7 @@ int DecodeOriginPacket(Char_t *infile){
     ////////////////////////////////////////////////////////////
     ////////////////////    Create Tree  ///////////////////////
     ////////////////////////////////////////////////////////////
-    TFile *fin = new TFile(Form("%s.root",infile),"recreate");
+    TFile *fin = new TFile(inputfile,"recreate");
     TTree *trin = new TTree("tree_Origin","tree_Origin");
     trin->Branch("packet_type",&packet_type,"packet_type/I");
     trin->Branch("packet_length",&packet_length,"packet_length/I");
@@ -185,22 +199,27 @@ int DecodeOriginPacket(Char_t *infile){
     int eventnum = 0;
     //int bytesnum = 0;
     while(!feof(fp)){
-        if(fread(&top,sizeof(char),2,fp)==NULL) break;
+        //if(fread(&top,sizeof(char),2,fp)==NULL) break;
+        if(!fread(&top,sizeof(char),2,fp)) break;
 
         if((top[0]&0xff)==0xeb && (top[1]&0xff)==0x90){
             //bytesnum++;
             //printf("I have found %d eb90\n",num);
-            if(fread(&sigle,sizeof(char),1,fp) == NULL) break;
-            if(fread(&top,sizeof(char),2,fp) == NULL) break;
+            //if(fread(&sigle,sizeof(char),1,fp) == NULL) break;
+            //if(fread(&top,sizeof(char),2,fp) == NULL) break;
+            if(!fread(&sigle,sizeof(char),1,fp)) break;
+            if(!fread(&top,sizeof(char),2,fp)) break;
             packet_type = (top[0]&0xc0)>>6;
             if(packet_type != 0) break;
             packet_length = ((top[0]&0x3f)<<8) + (top[1]&0xff);
             if(packet_length != 639){
                 printf("error in packet length %d and %dth Events\n",packet_length,eventnum);
             }
-            if(fread(&top,sizeof(char),2,fp)==NULL) break;
+            //if(fread(&top,sizeof(char),2,fp)==NULL) break;
+            if(!fread(&top,sizeof(char),2,fp)) break;
             packet_count = ((top[0]&0xff)<<8) + (top[1]&0xff);
-            if(fread(&onedata,sizeof(char),packet_length+5,fp)==NULL) break;
+            //if(fread(&onedata,sizeof(char),packet_length+5,fp)==NULL) break;
+            if(!fread(&onedata,sizeof(char),packet_length+5,fp)) break;
             second = ((onedata[0]&0xff)<<24) + ((onedata[1]&0xff)<<16) + ((onedata[2]&0xff)<<8) + (onedata[3]&0xff);
             millisecond = ((onedata[4]&0xff)<<8) + (onedata[5]&0xff);
             for(int i=0;i<22;i++){
@@ -264,6 +283,7 @@ int DecodeOriginPacket(Char_t *infile){
     return 0;
 }
 
+/*
 int DecodeCompressedPacket(Char_t *infile){
     ////////////////////////////////////////////////////////////
     ///////////////  Decoding Compressed Packet  ///////////////
@@ -631,3 +651,4 @@ int DecodeNormalPacket(Char_t *infile){
 
     return 0;
 }
+*/

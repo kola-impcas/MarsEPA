@@ -59,5 +59,6 @@
 ./MarsEPA_Decoding_C.so: /home/zhangyongjie/software/root/include/TVectorFfwd.h
 ./MarsEPA_Decoding_C.so: /home/zhangyongjie/software/root/include/TVectorDfwd.h
 ./MarsEPA_Decoding_C.so: /home/zhangyongjie/software/root/include/TFitResultPtr.h
+./MarsEPA_Decoding_C.so: Strsplit.C
 ./MarsEPA_Decoding_C.so: /home/zhangyongjie/software/root/include/cintdictversion.h /home/zhangyongjie/software/root/include/RVersion.h
 MarsEPA_Decoding_C__ROOTBUILDVERSION= 5.34/32

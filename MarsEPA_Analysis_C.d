@@ -81,5 +81,6 @@
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TSpectrum.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TMath.h
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/TError.h
+./MarsEPA_Analysis_C.so: Strsplit.C
 ./MarsEPA_Analysis_C.so: /home/zhangyongjie/software/root/include/cintdictversion.h /home/zhangyongjie/software/root/include/RVersion.h
 MarsEPA_Analysis_C__ROOTBUILDVERSION= 5.34/32
