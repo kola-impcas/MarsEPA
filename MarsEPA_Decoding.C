@@ -138,6 +138,7 @@ int DecodeOriginPacket(char *infile){
     ////////////////  Decoding Origin Packet  //////////////////
     ////////////////////////////////////////////////////////////
 
+    int lengthtmp;
     int packet_type;
     int packet_length;
     int packet_count;
@@ -194,32 +195,42 @@ int DecodeOriginPacket(char *infile){
     ///////////////////  Decoding Packet  ////////////////////////
     //////////////////////////////////////////////////////////////
     unsigned char onedata[700];
-    char top[2];
-    char sigle;
+    //char top[2];
+    char sigle1;
+    char sigle2;
+    char sigle3;
+    char top1[2];
+    char top2[2];
     int eventnum = 0;
     //int bytesnum = 0;
     while(!feof(fp)){
         //if(fread(&top,sizeof(char),2,fp)==NULL) break;
-        if(!fread(&top,sizeof(char),2,fp)) break;
+        //if(!fread(&top,sizeof(char),2,fp)) break;
+        if(!fread(&sigle1,sizeof(char),1,fp)) break;
+        if(!fread(&sigle2,sizeof(char),1,fp)) break;
 
-        if((top[0]&0xff)==0xeb && (top[1]&0xff)==0x90){
+        //if((top[0]&0xff)==0xeb && (top[1]&0xff)==0x90){
+        if((sigle1&0xff)==0xeb && (sigle2&0xff)==0x90){
             //bytesnum++;
             //printf("I have found %d eb90\n",num);
             //if(fread(&sigle,sizeof(char),1,fp) == NULL) break;
             //if(fread(&top,sizeof(char),2,fp) == NULL) break;
-            if(!fread(&sigle,sizeof(char),1,fp)) break;
-            if(!fread(&top,sizeof(char),2,fp)) break;
-            packet_type = (top[0]&0xc0)>>6;
-            if(packet_type != 0) break;
-            packet_length = ((top[0]&0x3f)<<8) + (top[1]&0xff);
-            if(packet_length != 639){
-                printf("error in packet length %d and %dth Events\n",packet_length,eventnum);
+            if(!fread(&sigle3,sizeof(char),1,fp)) break;
+            if(!fread(&top1,sizeof(char),2,fp)) break;
+            lengthtmp = ((top1[0]&0x3f)<<8) + (top1[1]&0xff);
+            //if(packet_type != 0) break;
+            
+            if(lengthtmp != 639){
+                printf("error in packet length %d and %dth Events\n",lengthtmp,eventnum);
             }
             //if(fread(&top,sizeof(char),2,fp)==NULL) break;
-            if(!fread(&top,sizeof(char),2,fp)) break;
-            packet_count = ((top[0]&0xff)<<8) + (top[1]&0xff);
+            if(!fread(&top2,sizeof(char),2,fp)) break;
             //if(fread(&onedata,sizeof(char),packet_length+5,fp)==NULL) break;
-            if(!fread(&onedata,sizeof(char),packet_length+5,fp)) break;
+            if(!fread(&onedata,sizeof(char),lengthtmp+5,fp)) break;
+            packet_type = (top1[0]&0xc0)>>6;
+            packet_length = ((top1[0]&0x3f)<<8) + (top1[1]&0xff);
+            packet_count = ((top2[0]&0xff)<<8) + (top2[1]&0xff);
+            if( ((onedata[6]&0xff)==0) && ((onedata[7]&0xff)==0) && ((onedata[8]&0xff)==0) && ((onedata[9]&0xff)==0) ) continue;
             second = ((onedata[0]&0xff)<<24) + ((onedata[1]&0xff)<<16) + ((onedata[2]&0xff)<<8) + (onedata[3]&0xff);
             millisecond = ((onedata[4]&0xff)<<8) + (onedata[5]&0xff);
             for(int i=0;i<22;i++){
