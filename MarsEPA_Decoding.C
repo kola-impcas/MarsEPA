@@ -185,7 +185,7 @@ int DecodeOriginPacket(char *infile){
     trin->Branch("HETCounts",&HETCounts,"HETCounts/I");
     trin->Branch("FracFreq",&FracFreq,"FracFreq/I");
 
-    FILE *fp = fopen(Form("%s",infile),"r");
+    FILE *fp = fopen(Form("%s",infile),"rb");
     if(!fp){
         printf("error in openning input file ... \n");
         return -1;
