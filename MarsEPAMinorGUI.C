@@ -208,11 +208,17 @@ void MarsEPAMinorFrame::DoDecode(){
 /////////// outputDir and outputName ///////////
   TString outputDirName,outputBaseName;
   outBaseName*/
+//  TGText *txt=0;
+  int eventnum=0;
   char inputFname[200];
   sprintf(inputFname,"%s",infilename.Data());
   ShowText("Begin Decoding: ");
-  DecodeOriginPacket(inputFname);
+  DecodeOriginPacket(inputFname,eventnum);
+//  ShowText(txt);
+  ShowText(Form("%d events have been processed!\n",eventnum*22));
+  ShowText(Form("%d packets have been processed!\n",eventnum));
   ShowText("Decoding End.");
+  ShowText("Decode Successfully");
 }
 
 void MarsEPAMinorFrame::DoDraw(Int_t id){

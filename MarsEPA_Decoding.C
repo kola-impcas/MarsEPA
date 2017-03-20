@@ -8,6 +8,7 @@
 #include "TTree.h"
 #include "TH1F.h"
 #include "Strsplit.C"
+#include "TGText.h"
 
 /*int CreateTreeFile(char* dest,char* src){
     int len,n;
@@ -121,7 +122,7 @@
     return 0;
 }
 */
-int DecodeOriginPacket(char *infile){
+int DecodeOriginPacket(char *infile,int& eventnum){
 
     char *inputfileTmp;
     inputfileTmp = new char[strlen(infile)+1];
@@ -133,7 +134,7 @@ int DecodeOriginPacket(char *infile){
 
     SplitString(inputfileTmp,".dat",inputfileDest);
     sprintf(inputfile,"%s.root",inputfileDest);
-
+    //txt->LoadBuffer(Form("outPut Decoding File: %s\n",inputfile));
     ////////////////////////////////////////////////////////////
     ////////////////  Decoding Origin Packet  //////////////////
     ////////////////////////////////////////////////////////////
@@ -201,7 +202,7 @@ int DecodeOriginPacket(char *infile){
     char sigle3;
     char top1[2];
     char top2[2];
-    int eventnum = 0;
+    //int eventnum = 0;
     //int bytesnum = 0;
     while(!feof(fp)){
         //if(fread(&top,sizeof(char),2,fp)==NULL) break;
@@ -279,6 +280,7 @@ int DecodeOriginPacket(char *infile){
             }
             if(eventnum < 5)
               printf("The last 5 bytes in %dth packet are respectively\t%x\t%x\t%x\t%x\t%x\n",eventnum, onedata[637], onedata[638], onedata[639], onedata[640], onedata[641]);
+            //  txt->LoadBuffer(Form("The last 5 bytes in %dth packet are respectively\t%x\t%x\t%x\t%x\t%x\n",eventnum, onedata[637], onedata[638], onedata[639], onedata[640], onedata[641]));
         }
         else{
             //fread(&top,sizeof(char),2,fp);
@@ -290,6 +292,8 @@ int DecodeOriginPacket(char *infile){
     fin->Close();
     printf("Totally %d Events have been processed!\n",eventnum*22);
     printf("Totally %d Packets have been processed!\n",eventnum);
+    //txt->LoadBuffer(Form("Totally %d Events have been processed!\n",eventnum*22));
+    //txt->LoadBuffer(Form("Totally %d Packets have been processed!\n",eventnum));
 
     return 0;
 }
