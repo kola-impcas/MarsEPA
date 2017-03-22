@@ -1,42 +1,46 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 project(MarsEPAMinorGUI)
 set(MarsEPAMinorGUI_VERSION_MAJOR 1)
 set(MarsEPAMinorGUI_VERSION_MINOR 1)
 
+#system configuration
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PSDAna_GUI_SOURCE_DIR}/cmake)
+#message(STATUS "${CMAKE_MODULE_PATH}")
+#include(CMakeParseArguments)
+#set ROOT system
 if(NOT DEFINED ENV{ROOTSYS})
     message(FATAL_ERROR "Please set environment variable ROOTSYS in your system")
 else()
-    #set(ROOTSYS $ENV())
     set(ROOTSYS $ENV{ROOTSYS})
     message(STATUS "ROOTSYS = ${ROOTSYS}")
 endif()
 
-#root executable
+#root executbles
 if(WIN32)
-    find_program(ROOTCINT_EXECUTABLE rootcint PATH ${ROOTSYS}/bin)
+    find_program(ROOTCINT_EXECUTABLE rootcint PATHS ${ROOTSYS}/bin)
 elseif(UNIX)
-    find_program(ROOTCINT_EXECUTABLE rootcint PATH ${ROOTSYS}/bin)
-    find_program(ROOT_CONFIG_EXCUTABLE root-config PATHS ${ROOTSYS}/bin)
+    find_program(ROOTCINT_EXECUTABLE rootcint PATHS ${ROOTSYS}/bin)
+    find_program(ROOT_CONFIG_EXECUTABLE root-config PATHS ${ROOTSYS}/bin)
 else(WIN32)
-    message(FATAL_ERROR "Platform not supported: only windows and unix are supported")
+    message(FATAL_ERROR "Platform not supportted: only windows and unix are supported")
 endif(WIN32)
 
 #root include path
 #set(ROOT_INCLUDE_DIR)
-if(UNIX)
+if(WIN32)
     set(ROOT_INCLUDE_DIR ${ROOTSYS}/include)
-else(UNIX)
+else(WIN32)
     execute_process(
         COMMAND ${ROOT_CONFIG_EXECUTABLE} --incdir
         OUTPUT_VARIABLE ROOT_INCLUDE_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-endif(UNIX)
+endif(WIN32)
 include_directories(${ROOT_INCLUDE_DIR})
 message(STATUS "ROOT_INCLUDE_DIR = ${ROOT_INCLUDE_DIR}")
 
 #root library
-if(UNIX)
+if(WIN32)
     set(ROOT_LIBRARY_DIR ${ROOTSYS}/lib)
     set(ROOT_LIBRARIES ${ROOTSYS}/lib/libCore.lib
                  ${ROOTSYS}/lib/libCint.lib ${ROOTSYS}/lib/libHist.lib
@@ -49,7 +53,7 @@ if(UNIX)
                  ${ROOTSYS}/lib/libSpectrum.lib
                  ${ROOTSYS}/lib/libGui.lib ${ROOTSYS}/lib/libGraf.lib
                  ${ROOTSYS}/lib/libGpad.lib)
-else(UNIX)
+else(WIN32)
     execute_process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --libdir
         OUTPUT_VARIABLE ROOT_LIBRARY_DIR
         OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -57,12 +61,11 @@ else(UNIX)
         OUTPUT_VARIABLE ROOT_LIBRARIES
         OUTPUT_STRIP_TRAILING_WHITESPACE)
     set(ROOT_LIBRARIES ${ROOT_LIBRARIES} -lSpectrum)
-endif(UNIX)
+endif(WIN32)
 link_directories(${ROOT_LIBRARY_DIR})
 message(STATUS "ROOT_LIBRARY_DIR = ${ROOT_LIBRARY_DIR}")
 message(STATUS "ROOT_LIBRARIES = ${ROOT_LIBRARIES}")
 
-#find_package(ROOT REQUIRED)
 #process root dictionary
 #define a function to process dictionary generation
 include(CMakeParseArguments)
@@ -108,22 +111,24 @@ function(ROOT_GENERATE_DICTIONARY dictionary)
                      DEPENDS ${headerfiles} ${linkdefs})
 endfunction()
 #add header files that need to generate dictionary
-#set(ROOT_DICT_SUFFIX Dict)
-#set(ROOT_LINKDEF_SUFFIX LinkDef.h)
-#set(ROOT_DICT_PRESOURCES GuiFrame)
-#set(ROOT_DICT_SOURCES)
-#foreach(name ${ROOT_DICT_PRESOURCES})
-#    ROOT_GENERATE_DICTIONARY(${name}${ROOT_DICT_SUFFIX} ${name}.h LINKDEF ${name}${ROOT_LINKDEF_SUFFIX})
-#    set(ROOT_DICT_SOURCES ${ROOT_DICT_SOURCES} ${name}${ROOT_DICT_SUFFIX}.cxx)
-#endforeach()
+set(ROOT_DICT_SUFFIX Dict)
+set(ROOT_LINKDEF_SUFFIX LinkDef.h)
+set(ROOT_DICT_PRESOURCES MarsEPAMinorFrame)
+set(ROOT_DICT_SOURCES)
+foreach(name ${ROOT_DICT_PRESOURCES})
+    ROOT_GENERATE_DICTIONARY(${name}${ROOT_DICT_SUFFIX} ${name}.h LINKDEF ${name}${ROOT_LINKDEF_SUFFIX})
+    set(ROOT_DICT_SOURCES ${ROOT_DICT_SOURCES} ${name}${ROOT_DICT_SUFFIX}.cxx)
+endforeach()
 
 
 #add executable
-set(PRIMARY_SOURCES MarsEPA_Decoding.C MarsEPAMinorGUI.C Strsplit.C)
-set(TOTAL_SOURCES ${PRIMARY_SOURCES})
+set(PRIMARY_SOURCES main.cxx MarsEPAMinorFrame.cxx)
+set(TOTAL_SOURCES ${PRIMARY_SOURCES} ${ROOT_DICT_SOURCES})
 add_executable(MarsEPAMinorGUI ${TOTAL_SOURCES})
 target_link_libraries(MarsEPAMinorGUI ${ROOT_LIBRARIES})
 
+#
+#file(COPY "config/calib.config" DESTINATION ${PROJECT_BINARY_DIR})
 
 #install the targets
 install(TARGETS MarsEPAMinorGUI DESTINATION bin)
@@ -132,7 +137,8 @@ install(DIRECTORY config/ DESTINATION bin)
 
 #build a installer package
 include(InstallRequiredSystemLibraries)
-set (CPACK_PACKAGE_VERSION_MAJOR "${MarsEPAMinorGUI_VERSION_MAJOR}")
-set (CPACK_PACKAGE_VERSION_MINOR "${MarsEPAMinorGUI_VERSION_MINOR}")
+#set (CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+set (CPACK_PACKAGE_VERSION_MAJOR "${PSDAna_GUI_VERSION_MAJOR}")
+set (CPACK_PACKAGE_VERSION_MINOR "${PSDAna_GUI_VERSION_MINOR}")
 set (CPACK_PACKAGE_EXECUTABLES MarsEPAMinorGUI "MarsEPAMinorGUI")
 include (CPack)
